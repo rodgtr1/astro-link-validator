@@ -79,6 +79,7 @@ Build failed: Found 2 broken links
 | `externalTimeout` | `number` | `5000` | Timeout in milliseconds for external link requests |
 | `verbose` | `boolean` | `false` | Show detailed logging information |
 | `base` | `string` | `undefined` | Base URL for resolving relative links |
+| `redirectsFile` | `string` | `undefined` | Path to redirects file (e.g., '_redirects', 'vercel.json') |
 
 ## 🛠️ Usage Examples
 

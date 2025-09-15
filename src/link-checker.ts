@@ -3,7 +3,8 @@ import { join, resolve, dirname, relative, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { load } from 'cheerio';
 import type { CheerioAPI } from 'cheerio';
-import type { Link, BrokenLink, LinkCheckResult, LinkCheckerOptions } from './types.js';
+import type { Link, BrokenLink, LinkCheckResult, LinkCheckerOptions } from './types';
+import { loadRedirects, findRedirectRule, applyRedirectRule, type RedirectRule } from './redirects.js';
 
 /**
  * Extract links from HTML content using Cheerio
@@ -134,9 +135,15 @@ function resolveUrl(href: string, basePath: string, baseUrl?: string): string {
 
 /**
  * Check if an internal link/asset exists in the build directory
+ * Also checks redirects to avoid false positives for redirected URLs
  */
-async function checkInternalLink(link: Link, buildDir: string, baseUrl?: string): Promise<BrokenLink | null> {
+async function checkInternalLink(link: Link, buildDir: string, redirects: RedirectRule[], baseUrl?: string): Promise<BrokenLink | null> {
   let { href } = link;
+  
+  // Skip external URLs - they should be handled by checkExternalLink
+  if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) {
+    return null;
+  }
   
   // Remove hash fragments and query parameters for file checking
   const cleanHref = href.split('#')[0].split('?')[0];
@@ -144,6 +151,27 @@ async function checkInternalLink(link: Link, buildDir: string, baseUrl?: string)
   // Handle anchor links - they're valid if the file exists
   if (href.startsWith('#')) {
     return null; // Skip anchor-only links for now
+  }
+  
+  // First, check if there's a redirect rule for this link (only if redirects are configured)
+  if (cleanHref.startsWith('/') && redirects.length > 0) {
+    const redirectRule = findRedirectRule(cleanHref, redirects);
+    if (redirectRule) {
+      // Found a redirect, check the redirect target instead
+      const redirectTarget = applyRedirectRule(cleanHref, redirectRule);
+      
+      // Recursively check the redirect target if it's still internal
+      if (redirectTarget.startsWith('/')) {
+        const redirectedLink: Link = {
+          ...link,
+          href: redirectTarget
+        };
+        return await checkInternalLink(redirectedLink, buildDir, redirects, baseUrl);
+      } else {
+        // Redirect target is external, consider the original link valid
+        return null;
+      }
+    }
   }
   
   // Convert to file system path
@@ -278,6 +306,7 @@ async function getHtmlFiles(dir: string, include: string[] = ['**/*.html']): Pro
 async function checkLinksInFile(
   filePath: string,
   buildDir: string,
+  redirects: RedirectRule[],
   options: {
     checkExternal: boolean;
     exclude: string[];
@@ -289,25 +318,28 @@ async function checkLinksInFile(
   const links = extractLinksFromHtml(html, filePath);
   const brokenLinks: BrokenLink[] = [];
   
-  for (const link of links) {
-    // Skip excluded patterns
-    if (options.exclude.some(pattern => link.href.includes(pattern))) {
-      continue;
-    }
-    
-    if (link.type === 'external') {
-      if (options.checkExternal) {
-        const brokenLink = await checkExternalLink(link, options.externalTimeout);
-        if (brokenLink) {
-          brokenLinks.push(brokenLink);
+  // Process links concurrently in batches of 10
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < links.length; i += BATCH_SIZE) {
+    const batch = links.slice(i, i + BATCH_SIZE);
+    const batchPromises = batch.map(async (link) => {
+      // Skip excluded patterns
+      if (options.exclude.some(pattern => link.href.includes(pattern))) {
+        return null;
+      }
+      
+      if (link.type === 'external') {
+        if (options.checkExternal) {
+          return await checkExternalLink(link, options.externalTimeout);
         }
+      } else if (link.type === 'internal' || link.type === 'asset') {
+        return await checkInternalLink(link, buildDir, redirects, options.base);
       }
-    } else if (link.type === 'internal' || link.type === 'asset') {
-      const brokenLink = await checkInternalLink(link, buildDir, options.base);
-      if (brokenLink) {
-        brokenLinks.push(brokenLink);
-      }
-    }
+      return null;
+    });
+    
+    const batchResults = await Promise.all(batchPromises);
+    brokenLinks.push(...batchResults.filter((result): result is BrokenLink => result !== null));
   }
   
   return { links, brokenLinks };
@@ -328,10 +360,18 @@ export async function checkLinks(
     externalTimeout: 5000,
     verbose: false,
     base: undefined as string | undefined,
+    redirectsFile: undefined as string | undefined,
     ...options
   };
   
   const buildDirPath = typeof buildDir === 'string' ? buildDir : fileURLToPath(buildDir);
+  
+  // Load redirects from the specified file (if configured)
+  const redirects = await loadRedirects(buildDirPath, resolvedOptions.redirectsFile);
+  if (resolvedOptions.verbose && redirects.length > 0) {
+    console.log(`📍 Loaded ${redirects.length} redirect rules from ${resolvedOptions.redirectsFile}`);
+  }
+  
   const htmlFiles = await getHtmlFiles(buildDirPath, resolvedOptions.include);
   
   const result: LinkCheckResult = {
@@ -343,7 +383,7 @@ export async function checkLinks(
   
   for (const filePath of htmlFiles) {
     try {
-      const { links, brokenLinks } = await checkLinksInFile(filePath, buildDirPath, resolvedOptions);
+      const { links, brokenLinks } = await checkLinksInFile(filePath, buildDirPath, redirects, resolvedOptions);
       
       result.totalLinks += links.length;
       result.brokenLinks.push(...brokenLinks);

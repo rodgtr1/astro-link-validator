@@ -33,6 +33,13 @@ export interface LinkCheckerOptions {
    * Base URL for resolving relative links
    */
   base?: string;
+
+  /**
+   * Path to redirects file (relative to build directory or absolute path)
+   * When provided, the checker will respect redirect rules before marking links as broken
+   * Common formats: '_redirects' (Netlify), 'vercel.json', 'netlify.toml'
+   */
+  redirectsFile?: string;
 }
 
 export interface Link {

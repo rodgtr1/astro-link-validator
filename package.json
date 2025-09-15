@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "node --test",
+    "test": "node --test --experimental-test-isolation=none",
     "test:watch": "node --test --watch",
     "test:coverage": "c8 npm test",
     "prepack": "npm run build && npm test"

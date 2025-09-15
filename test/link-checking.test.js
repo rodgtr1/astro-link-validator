@@ -144,4 +144,26 @@ describe('Configuration Options', () => {
     
     console.log('✅ Include patterns work correctly');
   });
+  
+  it('should handle redirects configuration', async () => {
+    const mockBuildDir = join(__dirname, 'fixtures/mock-build');
+    
+    // Test with no redirects file (should work as before)
+    const resultNoRedirects = await checkLinks(mockBuildDir, {
+      checkExternal: false,
+      verbose: false
+    });
+    
+    // Test with non-existent redirects file (should warn but continue)
+    const resultNonExistentFile = await checkLinks(mockBuildDir, {
+      checkExternal: false,
+      redirectsFile: 'non-existent-redirects',
+      verbose: false
+    });
+    
+    // Should work the same whether redirects are configured or not when no redirects exist
+    assert.strictEqual(resultNoRedirects.totalLinks, resultNonExistentFile.totalLinks, 'Should work the same with non-existent redirects file');
+    
+    console.log('✅ Redirects configuration works correctly');
+  });
 });

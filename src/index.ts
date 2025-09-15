@@ -2,7 +2,7 @@ import type { AstroIntegration } from 'astro';
 import { fileURLToPath } from 'node:url';
 import { relative } from 'node:path';
 import { checkLinks } from './link-checker.js';
-import type { LinkCheckerOptions } from './types.js';
+import type { LinkCheckerOptions } from './types';
 import pc from 'picocolors';
 
 /**
@@ -114,7 +114,7 @@ function getReasonColor(reason: string) {
 }
 
 // Export types for users
-export type { LinkCheckerOptions, Link, BrokenLink, LinkCheckResult } from './types.js';
+export type { LinkCheckerOptions, Link, BrokenLink, LinkCheckResult } from './types';
 
 // Export utilities for advanced users
 export { checkLinks, extractLinksFromHtml } from './link-checker.js';
