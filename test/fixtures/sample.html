@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact.html">Contact</a>
+        <a href="../parent.html">Parent</a>
+        <a href="./sibling.html">Sibling</a>
+    </nav>
+    
+    <main>
+        <h1>Test Content</h1>
+        
+        <!-- Various image sources -->
+        <img src="/images/logo.png" alt="Logo">
+        <img src="./local-image.jpg" alt="Local">
+        <img srcset="/images/small.jpg 300w, /images/large.jpg 600w" alt="Responsive">
+        
+        <!-- Scripts -->
+        <script src="/js/main.js"></script>
+        <script src="https://cdn.example.com/lib.js"></script>
+        
+        <!-- External links -->
+        <a href="https://example.com">External Link</a>
+        <a href="http://test.com">HTTP Link</a>
+        
+        <!-- Special links that should be ignored -->
+        <a href="mailto:test@example.com">Email</a>
+        <a href="tel:+1234567890">Phone</a>
+        <a href="javascript:void(0)">JavaScript</a>
+        
+        <!-- Anchor links -->
+        <a href="#section1">Anchor</a>
+        
+        <!-- Data URLs -->
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Data URL">
+    </main>
+    
+    <footer>
+        <iframe src="/embed.html"></iframe>
+    </footer>
+</body>
+</html>

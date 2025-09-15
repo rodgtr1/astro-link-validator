@@ -1,0 +1,35 @@
+# Development files
+src/
+*.ts
+tsconfig.json
+.git/
+.gitignore
+
+# Testing and documentation
+test/
+test-project/
+
+# Build artifacts we don't need
+*.tgz
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (never publish these)
+node_modules/
+
+# Only include what's needed:
+# - dist/ (compiled code)
+# - README.md (documentation)
+# - LICENSE (license)
+# - package.json (package info)

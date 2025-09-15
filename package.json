@@ -1,0 +1,50 @@
+{
+  "name": "astro-link-checker",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "An Astro integration that detects broken links during build time",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "test:coverage": "c8 npm test",
+    "prepack": "npm run build && npm test"
+  },
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "link-checker",
+    "build-tools",
+    "seo",
+    "broken-links"
+  ],
+  "author": "Travis Rodgers <travis@travisrodgers.dev>",
+  "license": "MIT",
+  "peerDependencies": {
+    "astro": "^4.0.0"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "picocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "astro": "^4.0.0",
+    "c8": "^8.0.1",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/travisrodgers/astro-link-checker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/travisrodgers/astro-link-checker/issues"
+  },
+  "homepage": "https://github.com/travisrodgers/astro-link-checker#readme"
+}
