@@ -1,7 +1,5 @@
 # 🔗 Astro Link Checker
 
-**Never deploy a site with broken links again!** 🚀
-
 Automatically detects broken links during your Astro build process with **security-hardened validation** and **high-performance concurrent processing**.
 
 [![GitHub](https://img.shields.io/github/license/rodgtr1/astro-link-checker)](LICENSE)
@@ -12,7 +10,12 @@ Automatically detects broken links during your Astro build process with **securi
 
 **Step 1: Install directly from GitHub**
 ```bash
+# Recommended
 npm install github:rodgtr1/astro-link-checker
+
+# Alternative methods
+npm install git+https://github.com/rodgtr1/astro-link-checker.git
+npm install github:rodgtr1/astro-link-checker#v1.0.0  # Specific version
 ```
 
 **Step 2: Add to your Astro config**
@@ -50,24 +53,6 @@ npm run build  # Link checking runs automatically!
 ✅ **TypeScript Support** - Full type definitions included  
 ✅ **Comprehensive Checking** - Internal links, assets, responsive images, and more  
 
-## 📦 Installation Options
-
-Since this package isn't published to NPM yet, install directly from GitHub:
-
-### ✅ Recommended (GitHub shorthand)
-```bash
-npm install github:rodgtr1/astro-link-checker
-```
-
-### Alternative methods
-```bash
-# Full GitHub URL
-npm install git+https://github.com/rodgtr1/astro-link-checker.git
-
-# Specific branch or tag
-npm install github:rodgtr1/astro-link-checker#main
-npm install github:rodgtr1/astro-link-checker#v1.0.0
-```
 
 ## ✅ Verify Installation
 
@@ -85,17 +70,7 @@ You should see something like:
     File not found: nonexistent
 ```
 
-## 🎯 What It Does
-
-✅ **Internal page links**: `/about`, `./contact.html`, `../index.html`  
-✅ **Asset references**: `/images/logo.png`, `/styles.css`, `/script.js`  
-✅ **External links** (optional): `https://example.com`  
-✅ **Responsive images**: All URLs in `srcset` attributes  
-✅ **Multiple HTML elements**: `<a>`, `<img>`, `<script>`, `<link>`, `<iframe>`, etc.  
-✅ **Beautiful error output** showing exactly what's broken  
-✅ **Configurable build failure** on broken links
-
-## 📖 Example Output
+## 📚 Example Output
 
 When you run `npm run build`, you'll see:
 
@@ -131,45 +106,24 @@ Build failed: Found 2 broken links
 | `externalTimeout` | `number` | `5000` | Timeout in milliseconds for external link requests | Slow networks, comprehensive external checking |
 | `verbose` | `boolean` | `false` | Show detailed logging information | Debugging, development, progress monitoring |
 | `base` | `string` | `undefined` | Base URL for resolving relative links | Multi-domain sites, absolute URL validation |
-| `redirectsFile` | `string` | `undefined` | Path to redirects file (e.g., '_redirects', 'vercel.json') | Netlify/Vercel deployments with redirects |
+| `redirectsFile` | `string` | `undefined` | Path to redirects file (e.g., '_redirects', 'vercel.json') | Netlify/Cloudflare/Vercel deployments with redirects |
 
-## 🛠️ Usage Examples
+## 🛮️ Usage Examples
 
-### Basic Setup
+### Development vs Production
 ```javascript
-linkChecker()
-```
-
-### Development Mode (Fast & Forgiving)
-```javascript
+// Development: Fast & forgiving
 linkChecker({
-  checkExternal: false,        // Skip external links
-  failOnBrokenLinks: false,    // Don't fail dev builds
-  verbose: true,               // Show progress
+  checkExternal: false,
+  failOnBrokenLinks: false,
+  verbose: true
 })
-```
 
-### Production Mode (Comprehensive & Strict)
-```javascript
+// Production: Comprehensive & strict  
 linkChecker({
-  checkExternal: true,         // Check everything
-  externalTimeout: 10000,      // Give external links time
-  failOnBrokenLinks: true,     // Fail if problems found
-  verbose: false,              // Keep logs clean in CI
-})
-```
-
-### Large Sites (With Exclusions)
-```javascript
-linkChecker({
-  exclude: [
-    '/admin/*',                    // Skip admin pages
-    '/drafts/*',                   // Skip draft content
-    'https://analytics.google.com/*', // Skip tracking scripts
-    'https://cdn.jsdelivr.net/*',     // CDN links are reliable
-    '*.pdf',                       // PDFs might move
-    '/api/*',                      // API endpoints
-  ]
+  checkExternal: true,
+  failOnBrokenLinks: true,
+  exclude: ['/admin/*', '*.pdf']
 })
 ```
 
@@ -201,7 +155,7 @@ export default defineConfig({
       
       // Advanced options
       base: 'https://mysite.com',      // Base URL for relative links
-      redirectsFile: '_redirects'      // Path to redirects file (Netlify/Vercel)
+      redirectsFile: '_redirects'      // Path to redirects file (Netlify/Cloudflare/Vercel)
     })
   ],
 });
@@ -226,31 +180,10 @@ export default defineConfig({
 });
 ```
 
-### Real-World Integration
-```javascript
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
-import linkChecker from 'astro-link-checker';
-
-export default defineConfig({
-  site: 'https://myblog.com',
-  integrations: [
-    mdx(),
-    sitemap(),
-    linkChecker({
-      checkExternal: false,           // Skip external links for speed
-      verbose: true,                  // Show progress
-      exclude: ['/admin/*'],          // Skip admin pages
-    })
-  ],
-});
-```
 
 ### Redirects Support
 
-If your site uses redirects (Netlify, Vercel, etc.), you can configure the link checker to respect them:
+If your site uses redirects (Netlify, Vercel, Cloudflare Pages, etc.), you can configure the link checker to respect them:
 
 ```javascript
 // For Netlify _redirects file
@@ -258,39 +191,100 @@ linkChecker({
   redirectsFile: '_redirects'  // Path relative to build directory
 })
 
-// For Vercel redirects or custom location
+// For Cloudflare Pages _redirects file (same format as Netlify)
+linkChecker({
+  redirectsFile: '_redirects'  // Cloudflare Pages uses same format
+})
+
+// For Vercel or custom location
 linkChecker({
   redirectsFile: '/path/to/redirects.json'  // Absolute path
 })
 ```
 
-**Example `_redirects` file (Netlify format):**
+#### Platform-Specific Examples
+
+**Netlify `_redirects` file:**
 ```
 /old-page /new-page 301
 /blog/:slug /posts/:slug 301
 /api/* https://api.example.com/v1/* 200
+/docs/* /documentation/:splat 301
 ```
+
+**Cloudflare Pages `_redirects` file:**
+```
+# Same format as Netlify
+/old-blog/* /blog/:splat 301
+/admin /dashboard 302
+/api/v1/* https://api.mysite.com/v1/:splat 200
+```
+
+**Vercel `vercel.json` redirects:**
+```json
+{
+  "redirects": [
+    {
+      "source": "/old-page",
+      "destination": "/new-page",
+      "permanent": true
+    }
+  ]
+}
+```
+
+> **Note**: Currently supports Netlify/Cloudflare `_redirects` format. Vercel JSON support coming soon.
 
 This prevents false positives when links are redirected rather than broken.
 
 ## 🚀 CI/CD Integration
 
-Perfect for GitHub Actions:
+**Good news**: Since link checking runs automatically during `npm run build`, it works out-of-the-box with **all deployment platforms** (Netlify, Cloudflare Pages, Vercel, etc.). No special configuration needed! 🎉
 
+### 🔍 When CI/CD Configuration Matters
+
+**1. Build Failure Control**
+```javascript
+// Development: Don't fail builds on broken links
+linkChecker({
+  failOnBrokenLinks: false  // Let builds succeed for previews
+})
+
+// Production: Fail builds to prevent broken deployments
+linkChecker({
+  failOnBrokenLinks: true   // Block deployment if links are broken
+})
+```
+
+**2. Environment-Specific Checking**
+```javascript
+// Different configs for different environments
+linkChecker({
+  checkExternal: process.env.NODE_ENV === 'production',
+  verbose: process.env.NODE_ENV === 'development',
+  exclude: process.env.NODE_ENV === 'production' 
+    ? ['/admin/*', '/drafts/*']  // Production: exclude more
+    : ['/admin/*']               // Development: minimal exclusions
+})
+```
+
+**3. Pull Request vs Main Branch**
 ```yaml
-name: Build and Check Links
-on: [push, pull_request]
+# GitHub Actions example for different branch behavior
+- name: Build with link checking
+  run: npm run build
+  env:
+    # Strict checking on main, lenient on PRs
+    LINK_CHECK_MODE: ${{ github.ref == 'refs/heads/main' && 'strict' || 'lenient' }}
+```
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - run: npm install
-      - run: npm run build  # Link checking runs automatically!
+**4. Large Site Optimization**
+```javascript
+// Skip external links in CI for speed, but check locally
+linkChecker({
+  checkExternal: !process.env.CI,  // Only check external links locally
+  verbose: !!process.env.CI        // Verbose in CI for debugging
+})
 ```
 
 ## 🔍 What Gets Checked
@@ -335,24 +329,6 @@ const result = await checkLinks('./dist', {
 console.log(`Found ${result.brokenLinks.length} broken links`);
 ```
 
-## 🧪 Testing Your Setup
-
-Create a test page with broken links:
-
-```astro
----
-// src/pages/test.astro
----
-<html>
-<body>
-  <h1>Test Page</h1>
-  <a href="/missing-page">This link is broken</a>
-  <img src="/missing-image.jpg" alt="Missing image" />
-</body>
-</html>
-```
-
-Run `npm run build` and see the broken links detected!
 
 ## 🔄 Updating
 
@@ -367,14 +343,6 @@ npm uninstall astro-link-checker
 npm install github:rodgtr1/astro-link-checker
 ```
 
-## ✨ Why GitHub Installation?
-
-✅ **No NPM account needed** - Install directly from source  
-✅ **Always up-to-date** - Get the latest features and security fixes  
-✅ **Works immediately** - No waiting for NPM publishing  
-✅ **Full functionality** - All features work exactly the same  
-✅ **Automatic building** - TypeScript compiles on installation  
-✅ **Security hardened** - Latest path traversal protection included
 
 ## 🏗️ How It Works
 
