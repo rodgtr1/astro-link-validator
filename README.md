@@ -18,6 +18,14 @@ npm install git+https://github.com/rodgtr1/astro-link-checker.git
 npm install github:rodgtr1/astro-link-checker#v1.0.0  # Specific version
 ```
 
+> **📝 Note**: This package includes pre-built JavaScript files (committed `dist/` folder) to ensure immediate compatibility when installed from GitHub. No build step required!
+> 
+> **🔄 Updates**: When updating the package, you may need to clear your node_modules and reinstall:
+> ```bash
+> npm uninstall astro-link-checker
+> npm install github:rodgtr1/astro-link-checker
+> ```
+
 **Step 2: Add to your Astro config**
 ```javascript
 // astro.config.mjs
@@ -43,6 +51,8 @@ npm run build  # Link checking runs automatically!
 - **Node.js** 18+ 
 - **Astro** 4.0+
 - **Git** (for GitHub installation)
+
+> **TypeScript Support**: Full TypeScript definitions included, but TypeScript is **not required** to use this integration. Works perfectly with JavaScript-only projects.
 
 ## ✨ Key Features
 ✅ **Path Traversal Protection** - Secure validation prevents malicious link attacks  
