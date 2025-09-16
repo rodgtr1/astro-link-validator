@@ -134,6 +134,16 @@ function resolveUrl(href: string, basePath: string, baseUrl?: string): string {
 }
 
 /**
+ * Validate that a resolved path is within the build directory
+ * Prevents path traversal attacks
+ */
+function validatePath(filePath: string, buildDir: string): boolean {
+  const resolved = resolve(filePath);
+  const basePath = resolve(buildDir);
+  return resolved.startsWith(basePath);
+}
+
+/**
  * Check if an internal link/asset exists in the build directory
  * Also checks redirects to avoid false positives for redirected URLs
  */
@@ -188,6 +198,15 @@ async function checkInternalLink(link: Link, buildDir: string, redirects: Redire
   
   // Normalize path separators
   filePath = filePath.replace(/[/\\\\]/g, sep);
+  
+  // Validate path to prevent directory traversal attacks
+  if (!validatePath(filePath, buildDir)) {
+    return {
+      ...link,
+      error: 'Invalid path - outside build directory',
+      reason: 'invalid'
+    };
+  }
   
   // Check if file exists
   if (existsSync(filePath)) {
@@ -381,21 +400,46 @@ export async function checkLinks(
     skippedFiles: []
   };
   
-  for (const filePath of htmlFiles) {
-    try {
-      const { links, brokenLinks } = await checkLinksInFile(filePath, buildDirPath, redirects, resolvedOptions);
-      
-      result.totalLinks += links.length;
-      result.brokenLinks.push(...brokenLinks);
-      result.checkedFiles.push(relative(buildDirPath, filePath));
-      
-      if (resolvedOptions.verbose) {
-        console.log(`Checked ${links.length} links in ${relative(buildDirPath, filePath)}`);
+  // Process files concurrently in batches for better performance
+  const FILE_BATCH_SIZE = 5; // Process 5 files at once
+  
+  for (let i = 0; i < htmlFiles.length; i += FILE_BATCH_SIZE) {
+    const batch = htmlFiles.slice(i, i + FILE_BATCH_SIZE);
+    const batchPromises = batch.map(async (filePath) => {
+      try {
+        const fileResult = await checkLinksInFile(filePath, buildDirPath, redirects, resolvedOptions);
+        return {
+          success: true as const,
+          filePath,
+          links: fileResult.links,
+          brokenLinks: fileResult.brokenLinks
+        };
+      } catch (error) {
+        return {
+          success: false as const,
+          filePath,
+          error: error instanceof Error ? error.message : String(error)
+        };
       }
-    } catch (error) {
-      result.skippedFiles.push(relative(buildDirPath, filePath));
-      if (resolvedOptions.verbose) {
-        console.warn(`Skipped ${relative(buildDirPath, filePath)}: ${error}`);
+    });
+    
+    const batchResults = await Promise.all(batchPromises);
+    
+    // Process batch results
+    for (const fileResult of batchResults) {
+      if (fileResult.success) {
+        result.totalLinks += fileResult.links.length;
+        result.brokenLinks.push(...fileResult.brokenLinks);
+        result.checkedFiles.push(relative(buildDirPath, fileResult.filePath));
+        
+        if (resolvedOptions.verbose) {
+          console.log(`Checked ${fileResult.links.length} links in ${relative(buildDirPath, fileResult.filePath)}`);
+        }
+      } else {
+        result.skippedFiles.push(relative(buildDirPath, fileResult.filePath));
+        if (resolvedOptions.verbose) {
+          console.warn(`Skipped ${relative(buildDirPath, fileResult.filePath)}: ${fileResult.error}`);
+        }
       }
     }
   }
