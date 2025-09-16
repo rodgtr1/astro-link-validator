@@ -1,40 +1,40 @@
-# 🔗 Astro Link Checker
+# 🔗 Astro Link Validator
 
-Automatically detects broken links during your Astro build process with **security-hardened validation** and **high-performance concurrent processing**.
+Automatically validates links during your Astro build process with **security-hardened validation** and **high-performance concurrent processing**.
 
-[![GitHub](https://img.shields.io/github/license/rodgtr1/astro-link-checker)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/rodgtr1/astro-link-checker)](https://github.com/rodgtr1/astro-link-checker/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/rodgtr1/astro-link-checker)](https://github.com/rodgtr1/astro-link-checker/issues)
+[![GitHub](https://img.shields.io/github/license/rodgtr1/astro-link-validator)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/rodgtr1/astro-link-validator)](https://github.com/rodgtr1/astro-link-validator/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/rodgtr1/astro-link-validator)](https://github.com/rodgtr1/astro-link-validator/issues)
 
 ## 🚀 Quick Start (GitHub Installation)
 
 **Step 1: Install directly from GitHub**
 ```bash
 # Recommended
-npm install github:rodgtr1/astro-link-checker
+npm install github:rodgtr1/astro-link-validator
 
 # Alternative methods
-npm install git+https://github.com/rodgtr1/astro-link-checker.git
-npm install github:rodgtr1/astro-link-checker#v1.0.0  # Specific version
+npm install git+https://github.com/rodgtr1/astro-link-validator.git
+npm install github:rodgtr1/astro-link-validator#v1.0.0  # Specific version
 ```
 
 > **📝 Note**: This package includes pre-built JavaScript files (committed `dist/` folder) to ensure immediate compatibility when installed from GitHub. No build step required!
 > 
 > **🔄 Updates**: When updating the package, you may need to clear your node_modules and reinstall:
 > ```bash
-> npm uninstall astro-link-checker
-> npm install github:rodgtr1/astro-link-checker
+> npm uninstall astro-link-validator
+> npm install github:rodgtr1/astro-link-validator
 > ```
 
 **Step 2: Add to your Astro config**
 ```javascript
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import linkChecker from 'astro-link-checker';
+import linkValidator from 'astro-link-validator';
 
 export default defineConfig({
   integrations: [
-    linkChecker()  // ← Add this line
+    linkValidator()  // ← Add this line
   ],
 });
 ```
@@ -68,7 +68,7 @@ npm run build  # Link checking runs automatically!
 
 After installing and configuring, verify it's working:
 
-1. **Check your `package.json`** - You should see `astro-link-checker` listed in dependencies
+1. **Check your `package.json`** - You should see `astro-link-validator` listed in dependencies
 2. **Run a build** - `npm run build` should show "🔗 Checking links..." in the output
 3. **Test with a broken link** - Add `<a href="/nonexistent">Test</a>` to any page and rebuild
 
@@ -123,14 +123,14 @@ Build failed: Found 2 broken links
 ### Development vs Production
 ```javascript
 // Development: Fast & forgiving
-linkChecker({
+linkValidator({
   checkExternal: false,
   failOnBrokenLinks: false,
   verbose: true
 })
 
 // Production: Comprehensive & strict  
-linkChecker({
+linkValidator({
   checkExternal: true,
   failOnBrokenLinks: true,
   exclude: ['/admin/*', '*.pdf']
@@ -141,11 +141,11 @@ linkChecker({
 ```javascript
 // astro.config.mjs - Showing ALL available options
 import { defineConfig } from 'astro/config';
-import linkChecker from 'astro-link-checker';
+import linkChecker from 'astro-link-validator';
 
 export default defineConfig({
   integrations: [
-    linkChecker({
+    linkValidator({
       // External link checking
       checkExternal: false,            // Enable/disable external link checking
       externalTimeout: 5000,           // Timeout for external requests (ms)
@@ -175,9 +175,9 @@ export default defineConfig({
 ```typescript
 // astro.config.mts - With full TypeScript support
 import { defineConfig } from 'astro/config';
-import linkChecker, { type LinkCheckerOptions } from 'astro-link-checker';
+import linkChecker, { type LinkValidatorOptions } from 'astro-link-validator';
 
-const linkCheckerConfig: LinkCheckerOptions = {
+const linkCheckerConfig: LinkValidatorOptions = {
   checkExternal: false,
   verbose: true,
   exclude: ['/admin/*'],
@@ -185,7 +185,7 @@ const linkCheckerConfig: LinkCheckerOptions = {
 
 export default defineConfig({
   integrations: [
-    linkChecker(linkCheckerConfig)
+    linkValidator(linkCheckerConfig)
   ],
 });
 ```
@@ -197,17 +197,17 @@ If your site uses redirects (Netlify, Vercel, Cloudflare Pages, etc.), you can c
 
 ```javascript
 // For Netlify _redirects file
-linkChecker({
+linkValidator({
   redirectsFile: '_redirects'  // Path relative to build directory
 })
 
 // For Cloudflare Pages _redirects file (same format as Netlify)
-linkChecker({
+linkValidator({
   redirectsFile: '_redirects'  // Cloudflare Pages uses same format
 })
 
 // For Vercel or custom location
-linkChecker({
+linkValidator({
   redirectsFile: '/path/to/redirects.json'  // Absolute path
 })
 ```
@@ -256,12 +256,12 @@ This prevents false positives when links are redirected rather than broken.
 **1. Build Failure Control**
 ```javascript
 // Development: Don't fail builds on broken links
-linkChecker({
+linkValidator({
   failOnBrokenLinks: false  // Let builds succeed for previews
 })
 
 // Production: Fail builds to prevent broken deployments
-linkChecker({
+linkValidator({
   failOnBrokenLinks: true   // Block deployment if links are broken
 })
 ```
@@ -269,7 +269,7 @@ linkChecker({
 **2. Environment-Specific Checking**
 ```javascript
 // Different configs for different environments
-linkChecker({
+linkValidator({
   checkExternal: process.env.NODE_ENV === 'production',
   verbose: process.env.NODE_ENV === 'development',
   exclude: process.env.NODE_ENV === 'production' 
@@ -291,7 +291,7 @@ linkChecker({
 **4. Large Site Optimization**
 ```javascript
 // Skip external links in CI for speed, but check locally
-linkChecker({
+linkValidator({
   checkExternal: !process.env.CI,  // Only check external links locally
   verbose: !!process.env.CI        // Verbose in CI for debugging
 })
@@ -315,7 +315,7 @@ linkChecker({
 ## 🆘 Troubleshooting
 
 ### 🔧 Installation Issues
-- **"Package not found"?** Make sure you're using `github:rodgtr1/astro-link-checker` (not `astro-link-checker`)
+- **"Package not found"?** Make sure you're using `github:rodgtr1/astro-link-validator` (not `astro-link-validator`)
 - **Git authentication errors?** Ensure you have Git installed and GitHub access
 - **Build failures during install?** Check you have Node.js 18+ and npm/yarn latest version
 
@@ -329,7 +329,7 @@ linkChecker({
 ## 💻 Programmatic Usage
 
 ```javascript
-import { checkLinks } from 'astro-link-checker';
+import { checkLinks } from 'astro-link-validator';
 
 const result = await checkLinks('./dist', {
   checkExternal: true,
@@ -344,13 +344,13 @@ console.log(`Found ${result.brokenLinks.length} broken links`);
 
 To get the latest version:
 ```bash
-npm update astro-link-checker
+npm update astro-link-validator
 ```
 
 Or reinstall from GitHub:
 ```bash
-npm uninstall astro-link-checker
-npm install github:rodgtr1/astro-link-checker
+npm uninstall astro-link-validator
+npm install github:rodgtr1/astro-link-validator
 ```
 
 

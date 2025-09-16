@@ -3,7 +3,7 @@ import { join, resolve, dirname, relative, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { load } from 'cheerio';
 import type { CheerioAPI } from 'cheerio';
-import type { Link, BrokenLink, LinkCheckResult, LinkCheckerOptions } from './types';
+import type { Link, BrokenLink, LinkCheckResult, LinkValidatorOptions } from './types';
 import { loadRedirects, findRedirectRule, applyRedirectRule, type RedirectRule } from './redirects.js';
 
 /**
@@ -369,7 +369,7 @@ async function checkLinksInFile(
  */
 export async function checkLinks(
   buildDir: string,
-  options: LinkCheckerOptions = {}
+  options: LinkValidatorOptions = {}
 ): Promise<LinkCheckResult> {
   const resolvedOptions = {
     checkExternal: false,

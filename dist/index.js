@@ -3,14 +3,14 @@ import { relative } from 'node:path';
 import { checkLinks } from './link-checker.js';
 import pc from 'picocolors';
 /**
- * Creates the Astro Link Checker integration
+ * Creates the Astro Link Validator integration
  */
-export default function astroLinkChecker(options = {}) {
+export default function linkValidator(options = {}) {
     return {
-        name: 'astro-link-checker',
+        name: 'astro-link-validator',
         hooks: {
             'astro:build:done': async ({ dir, logger }) => {
-                logger.info('🔗 Checking links...');
+                logger.info('🔗 Validating links...');
                 try {
                     const buildDir = fileURLToPath(dir);
                     const result = await checkLinks(buildDir, options);
@@ -62,15 +62,15 @@ export default function astroLinkChecker(options = {}) {
                 }
                 catch (error) {
                     if (error instanceof Error) {
-                        logger.error(`💥 Link checking failed: ${error.message}`);
+                        logger.error(`💥 Link validation failed: ${error.message}`);
                         if (options.failOnBrokenLinks !== false) {
                             throw error;
                         }
                     }
                     else {
-                        logger.error('💥 Link checking failed with unknown error');
+                        logger.error('💥 Link validation failed with unknown error');
                         if (options.failOnBrokenLinks !== false) {
-                            throw new Error('Link checking failed with unknown error');
+                            throw new Error('Link validation failed with unknown error');
                         }
                     }
                 }

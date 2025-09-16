@@ -1,4 +1,4 @@
-import type { Link, LinkCheckResult, LinkCheckerOptions } from './types';
+import type { Link, LinkCheckResult, LinkValidatorOptions } from './types';
 /**
  * Extract links from HTML content using Cheerio
  */
@@ -6,4 +6,4 @@ export declare function extractLinksFromHtml(html: string, sourceFile: string): 
 /**
  * Main function to check all links in the build directory
  */
-export declare function checkLinks(buildDir: string, options?: LinkCheckerOptions): Promise<LinkCheckResult>;
+export declare function checkLinks(buildDir: string, options?: LinkValidatorOptions): Promise<LinkCheckResult>;

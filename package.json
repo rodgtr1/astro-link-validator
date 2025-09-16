@@ -1,8 +1,8 @@
 {
-  "name": "astro-link-checker",
+  "name": "astro-link-validator",
   "type": "module",
   "version": "1.0.0",
-  "description": "An Astro integration that detects broken links during build time",
+  "description": "An Astro integration that validates links during build time",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -19,7 +19,7 @@
   "keywords": [
     "astro",
     "astro-integration",
-    "link-checker",
+    "link-validator",
     "build-tools",
     "seo",
     "broken-links"
@@ -41,10 +41,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rodgtr1/astro-link-checker.git"
+    "url": "git+https://github.com/rodgtr1/astro-link-validator.git"
   },
   "bugs": {
-    "url": "https://github.com/rodgtr1/astro-link-checker/issues"
+    "url": "https://github.com/rodgtr1/astro-link-validator/issues"
   },
-  "homepage": "https://github.com/rodgtr1/astro-link-checker#readme"
+  "homepage": "https://github.com/rodgtr1/astro-link-validator#readme"
 }

@@ -1,4 +1,4 @@
-export interface LinkCheckerOptions {
+export interface LinkValidatorOptions {
   /**
    * Whether to check external links (default: false)
    */
@@ -10,7 +10,7 @@ export interface LinkCheckerOptions {
   failOnBrokenLinks?: boolean;
 
   /**
-   * Patterns to exclude from link checking
+   * Patterns to exclude from link validation
    */
   exclude?: string[];
 
@@ -20,7 +20,7 @@ export interface LinkCheckerOptions {
   include?: string[];
 
   /**
-   * Timeout for external link checking in milliseconds (default: 5000)
+   * Timeout for external link validation in milliseconds (default: 5000)
    */
   externalTimeout?: number;
 
@@ -36,7 +36,7 @@ export interface LinkCheckerOptions {
 
   /**
    * Path to redirects file (relative to build directory or absolute path)
-   * When provided, the checker will respect redirect rules before marking links as broken
+   * When provided, the validator will respect redirect rules before marking links as broken
    * Common formats: '_redirects' (Netlify), 'vercel.json', 'netlify.toml'
    */
   redirectsFile?: string;

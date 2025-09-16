@@ -1,8 +1,8 @@
 import type { AstroIntegration } from 'astro';
-import type { LinkCheckerOptions } from './types';
+import type { LinkValidatorOptions } from './types';
 /**
- * Creates the Astro Link Checker integration
+ * Creates the Astro Link Validator integration
  */
-export default function astroLinkChecker(options?: LinkCheckerOptions): AstroIntegration;
-export type { LinkCheckerOptions, Link, BrokenLink, LinkCheckResult } from './types';
+export default function linkValidator(options?: LinkValidatorOptions): AstroIntegration;
+export type { LinkValidatorOptions, Link, BrokenLink, LinkCheckResult } from './types';
 export { checkLinks, extractLinksFromHtml } from './link-checker.js';

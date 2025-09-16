@@ -2,18 +2,18 @@ import type { AstroIntegration } from 'astro';
 import { fileURLToPath } from 'node:url';
 import { relative } from 'node:path';
 import { checkLinks } from './link-checker.js';
-import type { LinkCheckerOptions } from './types';
+import type { LinkValidatorOptions } from './types';
 import pc from 'picocolors';
 
 /**
- * Creates the Astro Link Checker integration
+ * Creates the Astro Link Validator integration
  */
-export default function astroLinkChecker(options: LinkCheckerOptions = {}): AstroIntegration {
+export default function linkValidator(options: LinkValidatorOptions = {}): AstroIntegration {
   return {
-    name: 'astro-link-checker',
+    name: 'astro-link-validator',
     hooks: {
       'astro:build:done': async ({ dir, logger }) => {
-        logger.info('🔗 Checking links...');
+        logger.info('🔗 Validating links...');
         
         try {
           const buildDir = fileURLToPath(dir);
@@ -71,14 +71,14 @@ export default function astroLinkChecker(options: LinkCheckerOptions = {}): Astr
           
         } catch (error) {
           if (error instanceof Error) {
-            logger.error(`💥 Link checking failed: ${error.message}`);
+            logger.error(`💥 Link validation failed: ${error.message}`);
             if (options.failOnBrokenLinks !== false) {
               throw error;
             }
           } else {
-            logger.error('💥 Link checking failed with unknown error');
+            logger.error('💥 Link validation failed with unknown error');
             if (options.failOnBrokenLinks !== false) {
-              throw new Error('Link checking failed with unknown error');
+              throw new Error('Link validation failed with unknown error');
             }
           }
         }
@@ -114,7 +114,7 @@ function getReasonColor(reason: string) {
 }
 
 // Export types for users
-export type { LinkCheckerOptions, Link, BrokenLink, LinkCheckResult } from './types';
+export type { LinkValidatorOptions, Link, BrokenLink, LinkCheckResult } from './types';
 
 // Export utilities for advanced users
 export { checkLinks, extractLinksFromHtml } from './link-checker.js';
