@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build outputs
-dist/
+# dist/ - we commit this for GitHub installations
 *.tsbuildinfo
 
 # Environment variables
