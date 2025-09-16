@@ -1,5 +1,7 @@
 # 🔗 Astro Link Validator
 
+![Astro Link Validator Man](./images/astro-broken-link-validator-man.jpg)
+
 Automatically validates links during your Astro build process with **security-hardened validation** and **high-performance concurrent processing**.
 
 [![GitHub](https://img.shields.io/github/license/rodgtr1/astro-link-validator)](LICENSE)
