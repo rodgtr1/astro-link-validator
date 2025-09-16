@@ -41,10 +41,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/travisrodgers/astro-link-checker.git"
+    "url": "git+https://github.com/rodgtr1/astro-link-checker.git"
   },
   "bugs": {
-    "url": "https://github.com/travisrodgers/astro-link-checker/issues"
+    "url": "https://github.com/rodgtr1/astro-link-checker/issues"
   },
-  "homepage": "https://github.com/travisrodgers/astro-link-checker#readme"
+  "homepage": "https://github.com/rodgtr1/astro-link-checker#readme"
 }

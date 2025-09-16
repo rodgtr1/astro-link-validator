@@ -4,15 +4,15 @@
 
 Automatically detects broken links during your Astro build process with **security-hardened validation** and **high-performance concurrent processing**.
 
-[![GitHub](https://img.shields.io/github/license/travisrodgers/astro-link-checker)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/travisrodgers/astro-link-checker)](https://github.com/travisrodgers/astro-link-checker/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/travisrodgers/astro-link-checker)](https://github.com/travisrodgers/astro-link-checker/issues)
+[![GitHub](https://img.shields.io/github/license/rodgtr1/astro-link-checker)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/rodgtr1/astro-link-checker)](https://github.com/rodgtr1/astro-link-checker/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/rodgtr1/astro-link-checker)](https://github.com/rodgtr1/astro-link-checker/issues)
 
 ## 🚀 Quick Start (GitHub Installation)
 
 **Step 1: Install directly from GitHub**
 ```bash
-npm install github:travisrodgers/astro-link-checker
+npm install github:rodgtr1/astro-link-checker
 ```
 
 **Step 2: Add to your Astro config**
@@ -56,17 +56,17 @@ Since this package isn't published to NPM yet, install directly from GitHub:
 
 ### ✅ Recommended (GitHub shorthand)
 ```bash
-npm install github:travisrodgers/astro-link-checker
+npm install github:rodgtr1/astro-link-checker
 ```
 
 ### Alternative methods
 ```bash
 # Full GitHub URL
-npm install git+https://github.com/travisrodgers/astro-link-checker.git
+npm install git+https://github.com/rodgtr1/astro-link-checker.git
 
 # Specific branch or tag
-npm install github:travisrodgers/astro-link-checker#main
-npm install github:travisrodgers/astro-link-checker#v1.0.0
+npm install github:rodgtr1/astro-link-checker#main
+npm install github:rodgtr1/astro-link-checker#v1.0.0
 ```
 
 ## ✅ Verify Installation
@@ -311,7 +311,7 @@ jobs:
 ## 🆘 Troubleshooting
 
 ### 🔧 Installation Issues
-- **"Package not found"?** Make sure you're using `github:travisrodgers/astro-link-checker` (not `astro-link-checker`)
+- **"Package not found"?** Make sure you're using `github:rodgtr1/astro-link-checker` (not `astro-link-checker`)
 - **Git authentication errors?** Ensure you have Git installed and GitHub access
 - **Build failures during install?** Check you have Node.js 18+ and npm/yarn latest version
 
@@ -364,7 +364,7 @@ npm update astro-link-checker
 Or reinstall from GitHub:
 ```bash
 npm uninstall astro-link-checker
-npm install github:travisrodgers/astro-link-checker
+npm install github:rodgtr1/astro-link-checker
 ```
 
 ## ✨ Why GitHub Installation?
