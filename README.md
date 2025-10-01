@@ -51,7 +51,7 @@ npm run build  # Link checking runs automatically!
 ## 🔧 Requirements
 
 - **Node.js** 18+ 
-- **Astro** 4.0+
+- **Astro** 4.0+ or 5.0+
 - **Git** (for GitHub installation)
 
 > **TypeScript Support**: Full TypeScript definitions included, but TypeScript is **not required** to use this integration. Works perfectly with JavaScript-only projects.

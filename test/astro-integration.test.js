@@ -7,7 +7,7 @@ describe('Astro Integration', () => {
     const integration = astroLinkChecker();
     
     assert(typeof integration === 'object', 'Should return an object');
-    assert(integration.name === 'astro-link-checker', 'Should have correct name');
+    assert(integration.name === 'astro-link-validator', 'Should have correct name');
     assert(typeof integration.hooks === 'object', 'Should have hooks object');
     assert(typeof integration.hooks['astro:build:done'] === 'function', 'Should have astro:build:done hook');
     
@@ -25,7 +25,7 @@ describe('Astro Integration', () => {
     
     // Should still return valid integration
     assert(typeof integration === 'object', 'Should return an object with options');
-    assert(integration.name === 'astro-link-checker', 'Should have correct name with options');
+    assert(integration.name === 'astro-link-validator', 'Should have correct name with options');
     
     console.log('✅ Configuration options accepted');
   });
@@ -34,7 +34,7 @@ describe('Astro Integration', () => {
     const integration = astroLinkChecker({});
     
     assert(typeof integration === 'object', 'Should work with empty options');
-    assert(integration.name === 'astro-link-checker', 'Should have correct name with empty options');
+    assert(integration.name === 'astro-link-validator', 'Should have correct name with empty options');
     
     console.log('✅ Empty options handled correctly');
   });
@@ -43,7 +43,7 @@ describe('Astro Integration', () => {
     const integration = astroLinkChecker();
     
     assert(typeof integration === 'object', 'Should work with no options');
-    assert(integration.name === 'astro-link-checker', 'Should have correct name with no options');
+    assert(integration.name === 'astro-link-validator', 'Should have correct name with no options');
     
     console.log('✅ No options handled correctly');
   });
