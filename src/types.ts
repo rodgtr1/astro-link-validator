@@ -10,12 +10,15 @@ export interface LinkValidatorOptions {
   failOnBrokenLinks?: boolean;
 
   /**
-   * Patterns to exclude from link validation
+   * Patterns to exclude from link validation, matched against the link href.
+   * A `*` matches any run of characters (e.g. '/admin/*', '*.pdf');
+   * a pattern without a `*` matches as a substring.
    */
   exclude?: string[];
 
   /**
-   * Include patterns for files to check (default: ['** /*.html'])
+   * Wildcard patterns for files to check, matched against paths relative to the
+   * build directory (default: ['** /*.html'])
    */
   include?: string[];
 
@@ -28,11 +31,6 @@ export interface LinkValidatorOptions {
    * Whether to show verbose output (default: false)
    */
   verbose?: boolean;
-
-  /**
-   * Base URL for resolving relative links
-   */
-  base?: string;
 
   /**
    * Path to redirects file (relative to build directory or absolute path)

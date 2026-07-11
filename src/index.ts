@@ -45,7 +45,7 @@ export default function linkValidator(options: LinkValidatorOptions = {}): Astro
             
             // Display broken links grouped by file
             for (const [file, links] of Object.entries(brokenLinksByFile)) {
-              console.log(`\\n${pc.red('📄 ' + file)}:`);
+              console.log(`\n${pc.red('📄 ' + file)}:`);
               
               links.forEach(link => {
                 const typeIcon = getTypeIcon(link.type);

@@ -113,12 +113,25 @@ Build failed: Found 2 broken links
 |--------|------|---------|-------------|-------------|
 | `checkExternal` | `boolean` | `false` | Enable checking of external HTTP(S) links | Production builds, comprehensive testing |
 | `failOnBrokenLinks` | `boolean` | `true` | Whether to fail the build when broken links are found | CI/CD pipelines, production deploys |
-| `exclude` | `string[]` | `[]` | Patterns to exclude from link checking | Skip admin areas, APIs, external CDNs |
-| `include` | `string[]` | `['**/*.html']` | File patterns to include in link checking | Custom build outputs, specific directories |
+| `exclude` | `string[]` | `[]` | Link patterns to skip, matched against the link's href | Skip admin areas, APIs, external CDNs |
+| `include` | `string[]` | `['**/*.html']` | File patterns to check, matched against paths relative to the build directory | Custom build outputs, specific directories |
 | `externalTimeout` | `number` | `5000` | Timeout in milliseconds for external link requests | Slow networks, comprehensive external checking |
 | `verbose` | `boolean` | `false` | Show detailed logging information | Debugging, development, progress monitoring |
-| `base` | `string` | `undefined` | Base URL for resolving relative links | Multi-domain sites, absolute URL validation |
 | `redirectsFile` | `string` | `undefined` | Path to redirects file (e.g., '_redirects', 'vercel.json') | Netlify/Cloudflare/Vercel deployments with redirects |
+
+### Pattern Matching
+
+Both `exclude` and `include` accept wildcard patterns where `*` matches any run of characters, **including `/`**:
+
+| Pattern | Matches |
+|---------|---------|
+| `/admin/*` | `/admin/users`, `/admin/settings/advanced` (but not `/admin` itself) |
+| `*.pdf` | `/docs/manual.pdf`, `/whitepaper.pdf` |
+| `https://analytics.google.com/*` | Any URL on that host |
+
+An `exclude` pattern with **no** `*` is matched as a plain substring, so `exclude: ['/drafts']` skips every link whose href contains `/drafts`.
+
+`include` patterns are matched against each file's path relative to the build directory, using `/` as the separator on every platform. A leading `**/` also matches the root, so the default `**/*.html` covers both `index.html` and `blog/post/index.html`. An `include` pattern with no `*` must match the path exactly (e.g. `index.html`).
 
 ## 🛮️ Usage Examples
 
@@ -158,7 +171,7 @@ export default defineConfig({
       
       // File inclusion/exclusion
       include: ['**/*.html'],          // File patterns to check
-      exclude: [                       // Patterns to exclude
+      exclude: [                       // Link patterns to skip
         '/admin/*',                    // Skip admin pages
         '/api/*',                      // Skip API routes
         '*.pdf',                       // Skip PDFs
@@ -166,7 +179,6 @@ export default defineConfig({
       ],
       
       // Advanced options
-      base: 'https://mysite.com',      // Base URL for relative links
       redirectsFile: '_redirects'      // Path to redirects file (Netlify/Cloudflare/Vercel)
     })
   ],
@@ -248,6 +260,8 @@ linkValidator({
 > **Note**: Currently supports Netlify/Cloudflare `_redirects` format. Vercel JSON support coming soon.
 
 This prevents false positives when links are redirected rather than broken.
+
+Redirect chains are followed up to 10 hops. If a link exceeds that — because two rules point at each other, or a rule redirects to itself — it's reported as broken with the reason `invalid` rather than being followed forever.
 
 ## 🚀 CI/CD Integration
 
