@@ -17,7 +17,7 @@ npm install github:rodgtr1/astro-link-validator
 
 # Alternative methods
 npm install git+https://github.com/rodgtr1/astro-link-validator.git
-npm install github:rodgtr1/astro-link-validator#v1.0.0  # Specific version
+npm install github:rodgtr1/astro-link-validator#v1.1.0  # Specific version
 ```
 
 > **📝 Note**: This package includes pre-built JavaScript files (committed `dist/` folder) to ensure immediate compatibility when installed from GitHub. No build step required!
