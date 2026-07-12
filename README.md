@@ -1,32 +1,20 @@
 # 🔗 Astro Link Validator
 
-![Astro Link Validator Man](./images/astro-broken-link-validator-man.jpg)
+![Astro Link Validator Man](https://raw.githubusercontent.com/rodgtr1/astro-link-validator/main/images/astro-broken-link-validator-man.jpg)
 
 Automatically validates links during your Astro build process with **security-hardened validation** and **high-performance concurrent processing**.
 
+[![npm version](https://img.shields.io/npm/v/astro-link-validator)](https://www.npmjs.com/package/astro-link-validator)
 [![GitHub](https://img.shields.io/github/license/rodgtr1/astro-link-validator)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/rodgtr1/astro-link-validator)](https://github.com/rodgtr1/astro-link-validator/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/rodgtr1/astro-link-validator)](https://github.com/rodgtr1/astro-link-validator/issues)
 
-## 🚀 Quick Start (GitHub Installation)
+## 🚀 Quick Start
 
-**Step 1: Install directly from GitHub**
+**Step 1: Install from npm**
 ```bash
-# Recommended
-npm install github:rodgtr1/astro-link-validator
-
-# Alternative methods
-npm install git+https://github.com/rodgtr1/astro-link-validator.git
-npm install github:rodgtr1/astro-link-validator#v1.1.0  # Specific version
+npm install astro-link-validator
 ```
-
-> **📝 Note**: This package includes pre-built JavaScript files (committed `dist/` folder) to ensure immediate compatibility when installed from GitHub. No build step required!
-> 
-> **🔄 Updates**: When updating the package, you may need to clear your node_modules and reinstall:
-> ```bash
-> npm uninstall astro-link-validator
-> npm install github:rodgtr1/astro-link-validator
-> ```
 
 **Step 2: Add to your Astro config**
 ```javascript
@@ -51,8 +39,7 @@ npm run build  # Link checking runs automatically!
 ## 🔧 Requirements
 
 - **Node.js** 18+ 
-- **Astro** 4.0+ or 5.0+
-- **Git** (for GitHub installation)
+- **Astro** 4.0+, 5.0+, 6.0+, or 7.0+
 
 > **TypeScript Support**: Full TypeScript definitions included, but TypeScript is **not required** to use this integration. Works perfectly with JavaScript-only projects.
 
@@ -331,8 +318,6 @@ linkValidator({
 ## 🆘 Troubleshooting
 
 ### 🔧 Installation Issues
-- **"Package not found"?** Make sure you're using `github:rodgtr1/astro-link-validator` (not `astro-link-validator`)
-- **Git authentication errors?** Ensure you have Git installed and GitHub access
 - **Build failures during install?** Check you have Node.js 18+ and npm/yarn latest version
 
 ### 🔍 Link Checking Issues
@@ -361,12 +346,6 @@ console.log(`Found ${result.brokenLinks.length} broken links`);
 To get the latest version:
 ```bash
 npm update astro-link-validator
-```
-
-Or reinstall from GitHub:
-```bash
-npm uninstall astro-link-validator
-npm install github:rodgtr1/astro-link-validator
 ```
 
 
