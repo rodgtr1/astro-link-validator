@@ -1,0 +1,12 @@
+# Two rules that point at each other - following them never terminates
+/loop-a /loop-b 301
+/loop-b /loop-a 301
+
+# A rule that redirects to itself
+/self /self 301
+
+# A redirect chain that ends at a page that exists
+/old-page /real-page 301
+
+# A redirect that lands on a page that does not exist
+/gone /missing-target 301

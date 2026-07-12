@@ -4,6 +4,10 @@ import { fileURLToPath } from 'node:url';
 import { load } from 'cheerio';
 import { loadRedirects, findRedirectRule, applyRedirectRule } from './redirects.js';
 /**
+ * Maximum number of redirects to follow before treating a link as a redirect loop
+ */
+const MAX_REDIRECT_DEPTH = 10;
+/**
  * Extract links from HTML content using Cheerio
  */
 export function extractLinksFromHtml(html, sourceFile) {
@@ -86,31 +90,46 @@ function parseSrcset(srcset) {
         .filter(Boolean);
 }
 /**
- * Resolve a relative URL against a base path
+ * Build an anchored regex from a wildcard pattern.
+ * A `*` matches any run of characters, including `/`. A leading globstar segment
+ * matches the empty string too, so the default include pattern covers both
+ * `index.html` and `blog/index.html`.
  */
-function resolveUrl(href, basePath, baseUrl) {
-    // Handle absolute URLs
-    if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) {
-        return href;
-    }
-    // Handle protocol-relative URLs
-    if (href.startsWith('//')) {
-        return `https:${href}`;
-    }
-    // Handle anchor links
-    if (href.startsWith('#')) {
-        return href;
-    }
-    // Handle root-relative URLs
-    if (href.startsWith('/')) {
-        if (baseUrl) {
-            return new URL(href, baseUrl).toString();
+function wildcardToRegExp(pattern) {
+    let source = '';
+    for (let i = 0; i < pattern.length; i++) {
+        if (pattern.startsWith('**/', i)) {
+            source += '(?:.*/)?';
+            i += 2;
         }
-        return href;
+        else if (pattern[i] === '*') {
+            while (pattern[i + 1] === '*')
+                i++;
+            source += '.*';
+        }
+        else {
+            source += pattern[i].replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+        }
     }
-    // Handle relative URLs
-    const resolvedPath = resolve(dirname(basePath), href);
-    return resolvedPath;
+    return new RegExp(`^${source}$`);
+}
+/**
+ * Match a link href against an `exclude` pattern.
+ * Patterns containing `*` match as wildcards against the whole href; patterns
+ * without one keep the original substring behaviour.
+ */
+function matchesExcludePattern(href, pattern) {
+    if (!pattern.includes('*')) {
+        return href.includes(pattern);
+    }
+    return wildcardToRegExp(pattern).test(href);
+}
+/**
+ * Match a build-relative file path (always posix separators) against an
+ * `include` pattern. A pattern without wildcards matches the path exactly.
+ */
+function matchesIncludePattern(relativePath, pattern) {
+    return wildcardToRegExp(pattern).test(relativePath);
 }
 /**
  * Validate that a resolved path is within the build directory
@@ -123,38 +142,42 @@ function validatePath(filePath, buildDir) {
 }
 /**
  * Check if an internal link/asset exists in the build directory
- * Also checks redirects to avoid false positives for redirected URLs
+ * Also follows redirects to avoid false positives for redirected URLs
  */
-async function checkInternalLink(link, buildDir, redirects, baseUrl) {
-    let { href } = link;
+async function checkInternalLink(link, buildDir, redirects) {
+    const { href } = link;
     // Skip external URLs - they should be handled by checkExternalLink
     if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) {
         return null;
     }
-    // Remove hash fragments and query parameters for file checking
-    const cleanHref = href.split('#')[0].split('?')[0];
     // Handle anchor links - they're valid if the file exists
     if (href.startsWith('#')) {
         return null; // Skip anchor-only links for now
     }
-    // First, check if there's a redirect rule for this link (only if redirects are configured)
-    if (cleanHref.startsWith('/') && redirects.length > 0) {
-        const redirectRule = findRedirectRule(cleanHref, redirects);
-        if (redirectRule) {
-            // Found a redirect, check the redirect target instead
-            const redirectTarget = applyRedirectRule(cleanHref, redirectRule);
-            // Recursively check the redirect target if it's still internal
-            if (redirectTarget.startsWith('/')) {
-                const redirectedLink = {
-                    ...link,
-                    href: redirectTarget
-                };
-                return await checkInternalLink(redirectedLink, buildDir, redirects, baseUrl);
+    // Remove hash fragments and query parameters for file checking
+    let cleanHref = href.split('#')[0].split('?')[0];
+    // Follow any redirect rules before touching the file system. Rules can chain
+    // (and can cycle), so cap how many hops we take.
+    if (redirects.length > 0) {
+        let hops = 0;
+        while (cleanHref.startsWith('/')) {
+            const redirectRule = findRedirectRule(cleanHref, redirects);
+            if (!redirectRule) {
+                break;
             }
-            else {
-                // Redirect target is external, consider the original link valid
+            if (++hops > MAX_REDIRECT_DEPTH) {
+                return {
+                    ...link,
+                    error: `Redirect loop: more than ${MAX_REDIRECT_DEPTH} redirects followed from ${href}`,
+                    reason: 'invalid'
+                };
+            }
+            const redirectTarget = applyRedirectRule(cleanHref, redirectRule);
+            // Redirect target is external, consider the original link valid
+            if (!redirectTarget.startsWith('/')) {
                 return null;
             }
+            cleanHref = redirectTarget.split('#')[0].split('?')[0];
         }
     }
     // Convert to file system path
@@ -256,7 +279,7 @@ async function checkExternalLink(link, timeout = 5000) {
     }
 }
 /**
- * Get all HTML files in a directory recursively
+ * Get all files in a directory recursively that match the include patterns
  */
 async function getHtmlFiles(dir, include = ['**/*.html']) {
     const files = [];
@@ -267,8 +290,12 @@ async function getHtmlFiles(dir, include = ['**/*.html']) {
             if (entry.isDirectory()) {
                 await walk(fullPath);
             }
-            else if (entry.isFile() && entry.name.endsWith('.html')) {
-                files.push(fullPath);
+            else if (entry.isFile()) {
+                // Patterns are always written with posix separators
+                const relativePath = relative(dir, fullPath).split(sep).join('/');
+                if (include.some(pattern => matchesIncludePattern(relativePath, pattern))) {
+                    files.push(fullPath);
+                }
             }
         }
     }
@@ -288,7 +315,7 @@ async function checkLinksInFile(filePath, buildDir, redirects, options) {
         const batch = links.slice(i, i + BATCH_SIZE);
         const batchPromises = batch.map(async (link) => {
             // Skip excluded patterns
-            if (options.exclude.some(pattern => link.href.includes(pattern))) {
+            if (options.exclude.some(pattern => matchesExcludePattern(link.href, pattern))) {
                 return null;
             }
             if (link.type === 'external') {
@@ -297,7 +324,7 @@ async function checkLinksInFile(filePath, buildDir, redirects, options) {
                 }
             }
             else if (link.type === 'internal' || link.type === 'asset') {
-                return await checkInternalLink(link, buildDir, redirects, options.base);
+                return await checkInternalLink(link, buildDir, redirects);
             }
             return null;
         });
@@ -317,7 +344,6 @@ export async function checkLinks(buildDir, options = {}) {
         include: ['**/*.html'],
         externalTimeout: 5000,
         verbose: false,
-        base: undefined,
         redirectsFile: undefined,
         ...options
     };
